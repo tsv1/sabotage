@@ -1,19 +1,30 @@
 from setuptools import setup, find_packages
-import sabotage
 
 
 setup(
     name="sabotage",
-    version=sabotage.__version__,
-    author="Nikita Tsvetkov",
-    author_email="nikitanovosibirsk@yandex.com",
+    version="0.1.0",
     description="",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
+    author="Nikita Tsvetkov",
+    author_email="nikitanovosibirsk@yandex.com",
+    python_requires=">=3.6.0",
     url="https://github.com/nikitanovosibirsk/sabotage",
-    license="MIT",
-    packages=find_packages(),
+    license="Apache 2",
+    packages=find_packages(exclude=("tests",)),
+    install_requires=[
+        "docker>=2.4,<=3.7",
+    ],
+    tests_require=[
+        "mypy==0.670",
+        "flake8==3.7.7",
+        "coverage==4.5.3",
+        "codecov==2.0.15",
+    ],
     classifiers=[
-        "License :: OSI Approved :: MIT License",
+        "License :: OSI Approved :: Apache Software License",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
     ],
 )
