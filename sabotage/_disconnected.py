@@ -22,7 +22,7 @@ class Disconnected:
             self._project_name = self._environment.get("COMPOSE_PROJECT_NAME")
 
     def __enter__(self) -> None:
-        filters: Dict[str, Any] = {"status": "running"}
+        filters = {"status": "running"}  # type: Dict[str, Any]
         if self._project_name is None:
             filters["name"] = self._name
         else:

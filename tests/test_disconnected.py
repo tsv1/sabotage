@@ -22,8 +22,8 @@ class TestDisconnected(unittest.TestCase):
         return container
 
     def _ping(self, container, host):
-        command = f"sh -c 'ping -q -c 1 -w 1 {host} > /dev/null && echo -n OK || echo -n FAIL'"
-        result = container.exec_run(command)
+        command = "sh -c 'ping -q -c 1 -w 1 {host} > /dev/null && echo -n OK || echo -n FAIL'"
+        result = container.exec_run(command.format(host=host))
         if isinstance(result, bytes):
             return result.decode()
         return result.output.decode()

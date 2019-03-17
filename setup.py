@@ -9,7 +9,7 @@ setup(
     long_description_content_type="text/markdown",
     author="Nikita Tsvetkov",
     author_email="nikitanovosibirsk@yandex.com",
-    python_requires=">=3.6.0",
+    python_requires=">=3.5.4",
     url="https://github.com/nikitanovosibirsk/sabotage",
     license="Apache 2",
     packages=find_packages(exclude=("tests",)),
