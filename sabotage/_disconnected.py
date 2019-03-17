@@ -1,7 +1,9 @@
+import os
 from typing import Any, Type, Optional, Dict, Callable
 from types import TracebackType
+from unittest.mock import sentinel as nil
 
-from docker import DockerClient, from_env
+from docker import DockerClient
 
 
 __all__ = ("Disconnected",)
@@ -9,11 +11,15 @@ __all__ = ("Disconnected",)
 
 class Disconnected:
     def __init__(self, name: str, *,
-                 project_name: str = None,
-                 docker_factory: Callable[[], DockerClient] = from_env) -> None:
+                 project_name: Optional[str] = nil,
+                 docker_factory: Callable[[], DockerClient] = DockerClient.from_env) -> None:
+        self._environment = os.environ
+        self._client = docker_factory(version="auto",  # type: ignore
+                                      environment=self._environment)
         self._name = name
         self._project_name = project_name
-        self._docker_factory = docker_factory
+        if self._project_name is nil:
+            self._project_name = self._environment.get("COMPOSE_PROJECT_NAME")
 
     def __enter__(self) -> None:
         filters: Dict[str, Any] = {"status": "running"}
@@ -25,7 +31,6 @@ class Disconnected:
                 "com.docker.compose.service=" + self._name,
             ]
 
-        self._client = self._docker_factory()
         self._containers = self._client.containers.list(filters=filters)
         assert len(self._containers) > 0
 
