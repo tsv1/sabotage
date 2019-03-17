@@ -3,8 +3,8 @@ from setuptools import setup, find_packages
 
 setup(
     name="sabotage",
-    version="0.1.0",
-    description="",
+    version="0.2.0",
+    description="Infra-tests made easy",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     author="Nikita Tsvetkov",
