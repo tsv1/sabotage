@@ -1,8 +1,9 @@
-from ._disconnected_network import DisconnectedNetwork
+from ._disconnected import Disconnected
 
 
-disconnected_network = DisconnectedNetwork
+disconnected = Disconnected
+sabotaged = Disconnected
 
 
-__all__ = ("disconnected_network", "DisconnectedNetwork")
+__all__ = ("sabotaged", "disconnected", "Disconnected")
 __version__ = "0.1.0"

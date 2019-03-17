@@ -3,10 +3,10 @@ from uuid import uuid4
 
 import docker
 
-from sabotage import disconnected_network
+from sabotage import disconnected
 
 
-class TestDisconnectedNetwork(unittest.TestCase):
+class TestDisconnected(unittest.TestCase):
     IMAGE_ALPINE = "alpine:3.9.2"
     COMMAND_WAIT = "sh -c 'trap : TERM INT; sleep 3600 & wait'"
     COMMAND_PING = "sh -c 'ping -q -c 1 -w 1 {host} > /dev/null && echo -n OK || echo -n FAIL'"
@@ -38,7 +38,7 @@ class TestDisconnectedNetwork(unittest.TestCase):
         self.network.remove()
         self.client.api.close()
 
-    def test_disconnected_network(self):
+    def test_disconnected(self):
         container1 = self._create_container(network=self.network.id)
         container2 = self._create_container(network=self.network.id)
         self.containers += [container1]
@@ -49,14 +49,14 @@ class TestDisconnectedNetwork(unittest.TestCase):
         res = self._ping(container2, container1.name)
         self.assertEqual(res, "OK")
 
-        with disconnected_network(container1.name):
+        with disconnected(container1.name):
             res = self._ping(container2, container1.name)
             self.assertEqual(res, "FAIL")
 
         res = self._ping(container2, container1.name)
         self.assertEqual(res, "OK")
 
-    def test_disconnected_network_with_compose_labels(self):
+    def test_disconnected_with_compose_labels(self):
         service_name, project_name = str(uuid4()), str(uuid4())
         container1 = self._create_container(name=service_name, network=self.network.id, labels={
             "com.docker.compose.project": project_name,
@@ -69,7 +69,7 @@ class TestDisconnectedNetwork(unittest.TestCase):
         container1.start()
         container2.start()
 
-        with disconnected_network(service_name, project_name=project_name):
+        with disconnected(service_name, project_name=project_name):
             res = self._ping(container2, container1.name)
             self.assertEqual(res, "FAIL")
 

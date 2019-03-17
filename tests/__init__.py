@@ -1,1 +1,1 @@
-from .test_disconnected_network import TestDisconnectedNetwork
+from .test_disconnected import TestDisconnected

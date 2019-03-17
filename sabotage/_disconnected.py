@@ -4,10 +4,10 @@ from types import TracebackType
 from docker import DockerClient, from_env
 
 
-__all__ = ("DisconnectedNetwork",)
+__all__ = ("Disconnected",)
 
 
-class DisconnectedNetwork:
+class Disconnected:
     def __init__(self, name: str, *,
                  project_name: str = None,
                  docker_factory: Callable[[], DockerClient] = from_env) -> None:
