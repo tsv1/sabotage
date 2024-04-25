@@ -1,9 +1,4 @@
-from ._disconnected import Disconnected
+from ._sabotaged_container import sabotaged_container
 
-
-disconnected = Disconnected
-sabotaged = Disconnected
-
-
-__all__ = ("sabotaged", "disconnected", "Disconnected")
-__version__ = "0.2.1"
+__all__ = ("sabotaged_container",)
+__version__ = "1.0.0"
