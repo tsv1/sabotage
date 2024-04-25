@@ -105,8 +105,9 @@ async def _search_containers(docker_client: DockerClient, *,
     result = []
 
     containers = await docker_client.containers.list()  # type: ignore
-    for container in containers:
-        await container.show()
+
+    for cont in containers:
+        container = await docker_client.containers.get(cont.id)  # type: ignore
 
         labels = container["Config"].get("Labels", {})
 
