@@ -16,6 +16,19 @@ async def sabotaged_container(service_name: str,
                               wait_interval: float = 0.01,
                               docker_client_factory: Callable[[], DockerClient] = DockerClient
                               ) -> AsyncGenerator[None, None]:
+    """
+    Context manager to temporarily stop and then restart a container.
+
+    :param service_name: The name of the service for which to sabotage the container.
+    :param project_name: The project name within which to find the container. If not specified,
+        attempts to derive from environment.
+    :param wait_timeout: The time in seconds to wait for the container to become healthy upon
+        restart.
+    :param wait_interval: The interval in seconds between health checks when waiting for container
+        restart.
+    :param docker_client_factory: A callable that returns a DockerClient instance.
+    :yields: None
+    """
     docker_client = docker_client_factory()
 
     container = None

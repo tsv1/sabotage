@@ -14,6 +14,15 @@ async def sabotaged_network(service_name: str,
                             *,
                             docker_client_factory: Callable[[], DockerClient] = DockerClient
                             ) -> AsyncGenerator[None, None]:
+    """
+    Context manager to temporarily disconnect and then reconnect a container from its networks.
+
+    :param service_name: The name of the service for which to sabotage the network connections.
+    :param project_name: The project name within which to find the container. If not specified,
+        attempts to derive from environment.
+    :param docker_client_factory: A callable that returns a DockerClient instance.
+    :yields: None
+    """
     docker_client = docker_client_factory()
 
     container = None

@@ -81,15 +81,36 @@ async def find_container(docker_client: DockerClient, *,
 
 
 async def start_container(docker_client: DockerClient, container: DockerContainer) -> None:
+    """
+    Start a specified Docker container.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param container: The Docker container to start.
+    """
     await container.start()  # type: ignore
 
 
 async def stop_container(docker_client: DockerClient, container: DockerContainer) -> None:
+    """
+    Stop a specified Docker container.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param container: The Docker container to stop.
+    """
     await container.stop()  # type: ignore
 
 
 async def wait_for_container(docker_client: DockerClient, container: DockerContainer, *,
                              timeout: float = 30.0, interval: float = 0.01) -> None:
+    """
+    Wait for a Docker container to become healthy within a given timeout.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param container: The Docker container to monitor.
+    :param timeout: The maximum time in seconds to wait for the container to become healthy.
+    :param interval: The time interval in seconds between health checks.
+    :raises HealthCheckTimeoutError: If the container does not become healthy within the timeout.
+    """
     start_time = monotonic()
     while (monotonic() - start_time) < timeout:
         container = await docker_client.containers.get(container.id)  # type: ignore
@@ -108,6 +129,12 @@ async def wait_for_container(docker_client: DockerClient, container: DockerConta
 
 
 async def connect_container(docker_client: DockerClient, container: DockerContainer) -> None:
+    """
+    Connect a specified Docker container to its networks.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param container: The Docker container to connect.
+    """
     container_networks = set(container["NetworkSettings"]["Networks"])
     for network_name in container_networks:
         network = await docker_client.networks.get(network_name)
@@ -115,6 +142,12 @@ async def connect_container(docker_client: DockerClient, container: DockerContai
 
 
 async def disconnect_container(docker_client: DockerClient, container: DockerContainer) -> None:
+    """
+    Disconnect a specified Docker container from its networks.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param container: The Docker container to disconnect.
+    """
     container_networks = set(container["NetworkSettings"]["Networks"])
 
     networks = await docker_client.networks.list()
