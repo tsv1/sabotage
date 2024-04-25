@@ -4,7 +4,8 @@ from typing import List, Optional
 from aiodocker import Docker as DockerClient
 from aiodocker.containers import DockerContainer
 
-__all__ = ("find_container", "start_container", "stop_container",)
+__all__ = ("find_container", "start_container", "stop_container",
+           "connect_container", "disconnect_container")
 
 
 class DockerError(Exception):
@@ -72,12 +73,30 @@ async def find_container(docker_client: DockerClient, *,
     return container
 
 
-async def start_container(container: DockerContainer) -> None:
+async def start_container(docker_client: DockerClient, container: DockerContainer) -> None:
     await container.start()  # type: ignore
 
 
-async def stop_container(container: DockerContainer) -> None:
+async def stop_container(docker_client: DockerClient, container: DockerContainer) -> None:
     await container.stop()  # type: ignore
+
+
+async def connect_container(docker_client: DockerClient, container: DockerContainer) -> None:
+    container_networks = set(container["NetworkSettings"]["Networks"])
+    for network_name in container_networks:
+        network = await docker_client.networks.get(network_name)
+        await network.connect({"Container": container["Id"]})
+
+
+async def disconnect_container(docker_client: DockerClient, container: DockerContainer) -> None:
+    container_networks = set(container["NetworkSettings"]["Networks"])
+
+    networks = await docker_client.networks.list()
+    for net in networks:
+        network_id, network_name = net["Id"], net["Name"]
+        if network_name in container_networks:
+            network = await docker_client.networks.get(network_id)
+            await network.disconnect({"Container": container["Id"]})
 
 
 async def _search_containers(docker_client: DockerClient, *,
