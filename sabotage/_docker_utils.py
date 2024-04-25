@@ -1,10 +1,12 @@
+import asyncio
 from os import environ
+from time import monotonic
 from typing import List, Optional
 
 from aiodocker import Docker as DockerClient
 from aiodocker.containers import DockerContainer
 
-__all__ = ("find_container", "start_container", "stop_container",
+__all__ = ("find_container", "start_container", "stop_container", "wait_for_container",
            "connect_container", "disconnect_container")
 
 
@@ -31,6 +33,11 @@ class ContainerNotRunningError(DockerError):
 
 class ContainerUnhealthyError(DockerError):
     """Exception raised when the found container is not healthy."""
+    pass
+
+
+class HealthCheckTimeoutError(DockerError):
+    """Exception raised when a container does not become healthy within the specified timeout."""
     pass
 
 
@@ -79,6 +86,25 @@ async def start_container(docker_client: DockerClient, container: DockerContaine
 
 async def stop_container(docker_client: DockerClient, container: DockerContainer) -> None:
     await container.stop()  # type: ignore
+
+
+async def wait_for_container(docker_client: DockerClient, container: DockerContainer, *,
+                             timeout: float = 30.0, interval: float = 0.01) -> None:
+    start_time = monotonic()
+    while (monotonic() - start_time) < timeout:
+        container = await docker_client.containers.get(container.id)  # type: ignore
+
+        health = container["State"].get("Health", {})
+        if health:
+            if health["Status"] == "healthy":
+                return
+        else:
+            if container["State"]["Status"] == "running":
+                return
+
+        await asyncio.sleep(interval)
+
+    raise HealthCheckTimeoutError(f"Container did not become healthy within {timeout} seconds")
 
 
 async def connect_container(docker_client: DockerClient, container: DockerContainer) -> None:
