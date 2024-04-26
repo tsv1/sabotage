@@ -17,6 +17,15 @@ $ pip3 install sabotage
 
 ### 📦 Sabotaged Container
 
+```python
+@asynccontextmanager
+async def sabotaged_container(service_name: str,
+                              project_name: Optional[str] = None,
+                              *,
+                              wait_timeout: float = 30.0,
+                              wait_interval: float = 0.01
+                              ) -> AsyncGenerator[None, None]:
+```
 Temporarily stops a specified Docker container and restarts it after performing tasks within the context. Useful for testing how applications handle Docker container failures.
 
 Parameters:
@@ -46,9 +55,7 @@ asyncio.run(test_container_restart())
 ```python
 @asynccontextmanager
 async def sabotaged_network(service_name: str,
-                            project_name: Optional[str] = None,
-                            *,
-                            docker_client_factory: Callable[[], DockerClient] = DockerClient
+                            project_name: Optional[str] = None
                             ) -> AsyncGenerator[None, None]:
 ```
 
