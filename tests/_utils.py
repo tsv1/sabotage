@@ -10,7 +10,8 @@ __all__ = ("docker_client_", "create_container", "create_network",)
 
 
 def create_network(docker_client: DockerClient, *,
-                   network_id: str, network_name: str) -> DockerNetwork:
+                   network_id: str,
+                   network_name: str) -> DockerNetwork:
     network_spec = {
         "Id": network_id,
         "Name": network_name,
@@ -29,7 +30,8 @@ def create_container(docker_client: DockerClient, *,
                      container_id: str,
                      project_name: str,
                      service_name: str,
-                     network_name: Optional[str] = None) -> DockerContainer:
+                     network_name: Optional[str] = None,
+                     status: Optional[str] = "running") -> DockerContainer:
     container_spec = {
         "Id": container_id,
         "Config": {
@@ -39,7 +41,7 @@ def create_container(docker_client: DockerClient, *,
             }
         },
         "State": {
-            "Status": "running"
+            "Status": status
         }
     }
 

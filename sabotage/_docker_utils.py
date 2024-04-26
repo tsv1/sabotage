@@ -11,43 +11,70 @@ __all__ = ("find_container", "start_container", "stop_container", "wait_for_cont
 
 
 class DockerError(Exception):
-    """Base class for Docker-related errors."""
+    """
+    Represents a base class for Docker-related errors.
+    """
     pass
 
 
 class NoContainersFoundError(DockerError):
-    """Exception raised when no containers match the given criteria."""
+    """
+    Raised when no containers match the given criteria.
+    """
     pass
 
 
 class MultipleContainersFoundError(DockerError):
-    """Exception raised when multiple containers match the given criteria
-    when only one was expected."""
+    """
+    Raised when multiple containers are found for a service when only one was expected.
+    """
     pass
 
 
 class ContainerNotRunningError(DockerError):
-    """Exception raised when the found container is not running."""
+    """
+    Raised when the identified container is not running.
+    """
     pass
 
 
 class ContainerUnhealthyError(DockerError):
-    """Exception raised when the found container is not healthy."""
+    """
+    Raised when the identified container is in an unhealthy state.
+    """
     pass
 
 
 class HealthCheckTimeoutError(DockerError):
-    """Exception raised when a container does not become healthy within the specified timeout."""
+    """
+    Raised when a container does not become healthy within the specified timeout period.
+    """
     pass
 
 
 class ProjectNameNotFoundError(DockerError):
-    """Exception raised when the project name cannot be resolved."""
+    """
+    Raised when the project name cannot be resolved either through parameters or environment.
+    """
     pass
 
 
 async def find_container(docker_client: DockerClient, *,
                          service_name: str, project_name: Optional[str] = None) -> DockerContainer:
+    """
+    Locate a specific Docker container by service and project name.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param service_name: The name of the service to match containers.
+    :param project_name: The name of the project to match containers.
+        If None, uses COMPOSE_PROJECT_NAME from environment.
+    :return: The Docker container instance found.
+    :raises ProjectNameNotFoundError: If no project name is provided or set in the environment.
+    :raises NoContainersFoundError: If no containers are found that match the criteria.
+    :raises MultipleContainersFoundError: If more than one container matches the criteria.
+    :raises ContainerNotRunningError: If the found container is not running.
+    :raises ContainerUnhealthyError: If the found container is unhealthy.
+    """
     project_name = project_name or environ.get("COMPOSE_PROJECT_NAME", "")
     if not project_name:
         raise ProjectNameNotFoundError(
@@ -161,6 +188,14 @@ async def disconnect_container(docker_client: DockerClient, container: DockerCon
 async def _search_containers(docker_client: DockerClient, *,
                              service_name: Optional[str],
                              project_name: Optional[str] = None) -> List[DockerContainer]:
+    """
+    Search for Docker containers matching specific criteria within the Docker environment.
+
+    :param docker_client: The Docker client instance to use for API requests.
+    :param service_name: The name of the service to match containers against.
+    :param project_name: The name of the project to match containers against, if specified.
+    :return: A list of Docker containers that match the specified criteria.
+    """
     result = []
 
     containers = await docker_client.containers.list()  # type: ignore

@@ -15,16 +15,22 @@ $ pip3 install sabotage
 
 ## Usage
 
-1. `sabotaged_container`
+### 📦 Sabotaged Container
 
 Temporarily stops a specified Docker container and restarts it after performing tasks within the context. Useful for testing how applications handle Docker container failures.
+
+Parameters:
+- `service_name` (str): The name of the Docker service.
+- `project_name` (str): (Optional) The Docker Compose project name. If not provided, it defaults to the `COMPOSE_PROJECT_NAME` environment variable.
+- `wait_timeout` (float): (Optional) The maximum time to wait for the container to become healthy upon restart.
+- `wait_interval` (float): (Optional) The polling interval to check the container's health status.
 
 ```python
 import asyncio
 from sabotage import sabotaged_container
 
 async def test_container_restart():
-    async with sabotaged_container(service_name="webapp"):
+    async with sabotaged_container("app"):
         # Perform actions while the container is stopped
         print("Container is temporarily stopped.")
 
@@ -34,16 +40,29 @@ async def test_container_restart():
 asyncio.run(test_container_restart())
 ```
 
-2. `sabotaged_network`
+### 🌐 Sabotaged Network
+
+
+```python
+@asynccontextmanager
+async def sabotaged_network(service_name: str,
+                            project_name: Optional[str] = None,
+                            *,
+                            docker_client_factory: Callable[[], DockerClient] = DockerClient
+                            ) -> AsyncGenerator[None, None]:
+```
 
 Disconnects and reconnects a container from its networks to simulate network issues.
+
+- `service_name` (str): The name of the Docker service.
+- `project_name` (str): (Optional) The Docker Compose project name. If not provided, it defaults to the `COMPOSE_PROJECT_NAME` environment variable.
 
 ```python
 import asyncio
 from sabotage import sabotaged_network
 
 async def test_network_disruption():
-    async with sabotaged_network(service_name="webapp"):
+    async with sabotaged_network("app"):
         # Perform actions while the network is disconnected
         print("Network is temporarily disconnected.")
 
